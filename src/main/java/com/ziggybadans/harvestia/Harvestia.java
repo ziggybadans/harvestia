@@ -1,5 +1,7 @@
 package com.ziggybadans.harvestia;
 
+import com.ziggybadans.harvestia.registry.ModBlocks;
+import com.ziggybadans.harvestia.registry.ModItems;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -17,7 +19,9 @@ public class Harvestia implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+		LOGGER.info("Setting up Harvestia...");
 
-		LOGGER.info("Hello Fabric world!");
+		ModItems.registerModItems();
+		ModBlocks.registerModBlocks();
 	}
 }
