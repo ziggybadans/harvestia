@@ -13,7 +13,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.world.biome.Biome;
 
 public class ModCommands {
     public static void register() {
@@ -21,6 +23,7 @@ public class ModCommands {
     }
 
     private static void registerSeasonCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
+        // Registration for setSeason
         dispatcher.register(CommandManager.literal("setSeason")
                 .requires(source -> source.hasPermissionLevel(2)) // Require OP level 2
                 .then(CommandManager.argument("season", StringArgumentType.word())
@@ -54,6 +57,39 @@ public class ModCommands {
                                 return 0;
                             }
                         }))
+        );
+
+        // Registration for getSeason
+        dispatcher.register(CommandManager.literal("getSeason")
+                .executes(context -> {
+                    // Get the current season
+                    Season season = SeasonColorManager.getCurrentSeason();
+                    // Send feedback to the player
+                    context.getSource().sendFeedback(() -> Text.literal("Current season is " + season.name()), false);
+                    return Command.SINGLE_SUCCESS;
+                })
+        );
+
+        // Registration for getTemperature
+        dispatcher.register(CommandManager.literal("getTemperature")
+                .executes(context -> {
+                    // Get the player and current biome temperature
+                    ServerCommandSource source = context.getSource();
+                    // Ensure the command issuer is a player
+                    if (source.getEntity() instanceof ServerPlayerEntity player) {
+                        // Retrieve the biome at the player's position
+                        Biome biome = player.getWorld().getBiome(player.getBlockPos()).value();
+
+                        // Get the temperature of the biome (not taking into account the BlockPos height adjustments)
+                        float adjustedTemperature = SeasonColorManager.getAdjustedBiomeTemperature(biome);
+
+                        // Send feedback with the biome temperature to the player
+                        source.sendFeedback(() -> Text.literal(String.format("The current temperature in " + biome + " is %.2f", adjustedTemperature)), false);
+                    } else {
+                        source.sendError(Text.literal("You need to be a player to use this command!"));
+                    }
+                    return Command.SINGLE_SUCCESS;
+                })
         );
     }
 }

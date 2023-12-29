@@ -1,7 +1,6 @@
 package com.ziggybadans.harvestia.world;
 
 import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.biome.Biome;
@@ -36,6 +35,19 @@ public class SeasonColorManager {
 
         // Apply the tint to the biome color
         return applyColorTint(biomeColor, seasonTint);
+    }
+
+    public static float getAdjustedBiomeTemperature(Biome biome) {
+        float originalTemperature = biome.getTemperature(); // Base biome temperature without BlockPos adjustment
+        return adjustTemperatureForSeason(originalTemperature);
+    }
+
+    private static float adjustTemperatureForSeason(float originalTemperature) {
+        return switch (getCurrentSeason()) {
+            case WINTER -> Math.max(originalTemperature - 0.15f, 0.0f);
+            case SUMMER -> Math.min(originalTemperature + 0.15f, 2.0f);
+            default -> originalTemperature;
+        };
     }
 
     private static float[] getColorTintForSeason(Season season) {
