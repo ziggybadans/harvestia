@@ -5,7 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.ziggybadans.harvestia.HarvestiaClient;
 import com.ziggybadans.harvestia.world.Season;
-import com.ziggybadans.harvestia.world.SeasonColorManager;
+import com.ziggybadans.harvestia.world.SeasonSharedManager;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -21,7 +21,7 @@ public class ModCommands {
     }
 
     private static void registerSeasonCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("setSeason")
+        dispatcher.register(CommandManager.literal("setseason")
                 .requires(source -> source.hasPermissionLevel(2)) // Require OP level 2
                 .then(CommandManager.argument("season", StringArgumentType.word())
                         .suggests((context, builder) -> {
@@ -32,7 +32,7 @@ public class ModCommands {
                         })
                         .executes(context -> {
                             String seasonName = StringArgumentType.getString(context, "season");
-                            Season season = SeasonColorManager.setSeasonFromString(seasonName);
+                            Season season = SeasonSharedManager.setSeasonFromString(seasonName);
 
                             if (season != null) {
                                 context.getSource().sendFeedback(() -> Text.literal("Season set to " + seasonName), false);
@@ -55,5 +55,12 @@ public class ModCommands {
                             }
                         }))
         );
+
+        dispatcher.register(CommandManager.literal("getseason")
+                .executes(context -> {
+                    Season currentSeason = SeasonSharedManager.getCurrentSeason();
+                    context.getSource().sendFeedback(() -> Text.literal("Current season is " + currentSeason.name()), false);
+                    return Command.SINGLE_SUCCESS;
+                }));
     }
 }

@@ -1,38 +1,17 @@
 package com.ziggybadans.harvestia.world;
 
 import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
 
 public class SeasonColorManager {
-    private static Season currentSeason = Season.SPRING;
-
-    public static void setCurrentSeason(Season season) {
-        currentSeason = season;
-    }
-
-    public static Season getCurrentSeason() {
-        return currentSeason;
-    }
-
-    public static Season setSeasonFromString(String seasonName) {
-        try {
-            Season parsedSeason = Season.valueOf(seasonName.toUpperCase());
-            setCurrentSeason(parsedSeason);
-            return parsedSeason;
-        } catch (IllegalArgumentException e) {
-            return null; // Invalid season string
-        }
-    }
 
     public static int getSeasonalColor(BlockRenderView world, BlockPos pos) {
         // Get the default biome color
         int biomeColor = BiomeColors.getFoliageColor(world, pos);
 
         // Calculate the color tint based on the current season
-        float[] seasonTint = getColorTintForSeason(currentSeason);
+        float[] seasonTint = getColorTintForSeason(SeasonSharedManager.getCurrentSeason());
 
         // Apply the tint to the biome color
         return applyColorTint(biomeColor, seasonTint);
