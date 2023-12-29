@@ -3,7 +3,8 @@
 	"package": "com.ziggybadans.harvestia.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"MixinBlockColors"
 	],
 	"injectors": {
 		"defaultRequire": 1
