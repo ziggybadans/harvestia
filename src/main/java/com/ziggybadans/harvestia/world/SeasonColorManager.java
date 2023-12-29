@@ -22,7 +22,7 @@ public class SeasonColorManager {
             case SPRING -> new float[]{0.9f, 1.1f, 0.9f}; // Slightly green tint for spring
             case SUMMER -> new float[]{1f, 1f, 1f}; // No tint for summer
             case AUTUMN -> new float[]{1.2f, 0.8f, 0.4f}; // Orange/brown tint for autumn
-            case WINTER -> new float[]{0.8f, 0.9f, 1.1f}; // Slightly blue/cold tint for winter
+            case WINTER -> new float[]{0.8f, 0.7f, 1.1f}; // Slightly blue/cold tint for winter
             default -> new float[]{1f, 1f, 1f}; // Default as a fallback
         };
     }
