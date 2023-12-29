@@ -2,6 +2,7 @@ package com.ziggybadans.harvestia;
 
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
+import com.ziggybadans.harvestia.util.ModCommands;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -23,5 +24,7 @@ public class Harvestia implements ModInitializer {
 
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
+
+		ModCommands.register();
 	}
 }
