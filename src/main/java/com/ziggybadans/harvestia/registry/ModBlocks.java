@@ -2,6 +2,7 @@ package com.ziggybadans.harvestia.registry;
 
 import com.ziggybadans.harvestia.Harvestia;
 import com.ziggybadans.harvestia.block.CornCropBlock;
+import com.ziggybadans.harvestia.block.SweetPotatoCropBlock;
 import com.ziggybadans.harvestia.block.TomatoCropBlock;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
@@ -20,10 +21,12 @@ public class ModBlocks {
     public static final Block ROCKY_STONE = registerBlock("rocky_stone",
             new Block(FabricBlockSettings.copyOf(Blocks.STONE)));
 
-    public static final Block TOMATO_CROP = Registry.register(Registries.BLOCK, new Identifier(Harvestia.MOD_ID, "tomato_crop"),
-            new TomatoCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT)));
+    //public static final Block TOMATO_CROP = Registry.register(Registries.BLOCK, new Identifier(Harvestia.MOD_ID, "tomato_crop"),
+            //new TomatoCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT)));
     public static final Block CORN_CROP = Registry.register(Registries.BLOCK, new Identifier(Harvestia.MOD_ID, "corn_crop"),
             new CornCropBlock(FabricBlockSettings.copyOf(Blocks.WHEAT)));
+    public static final Block SWEET_POTATO_CROP = Registry.register(Registries.BLOCK, new Identifier(Harvestia.MOD_ID, "sweet_potato_crop"),
+            new SweetPotatoCropBlock(FabricBlockSettings.copyOf(Blocks.POTATOES)));
 
     private static void addItemsToNaturalItemGroup(FabricItemGroupEntries entries) {
         entries.add(ROCKY_STONE);
