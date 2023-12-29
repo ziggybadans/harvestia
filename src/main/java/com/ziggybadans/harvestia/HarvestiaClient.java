@@ -1,6 +1,7 @@
 package com.ziggybadans.harvestia;
 
 import com.ziggybadans.harvestia.registry.ModBlocks;
+import com.ziggybadans.harvestia.world.Season;
 import com.ziggybadans.harvestia.world.SeasonColorManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -9,7 +10,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 
 public class HarvestiaClient implements ClientModInitializer {
-    public static final Identifier SEASON_COLOR_TOGGLE_PACKET_ID = new Identifier(Harvestia.MOD_ID, "season_color_toggle");
+    public static final Identifier SEASON_COLOR_TOGGLE_PACKET_ID = new Identifier(Harvestia.MOD_ID, "season_change");
     @Override
     public void onInitializeClient() {
         //BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TOMATO_CROP, RenderLayer.getCutout());
@@ -19,11 +20,12 @@ public class HarvestiaClient implements ClientModInitializer {
         // Register the packet
         ClientPlayNetworking.registerGlobalReceiver(SEASON_COLOR_TOGGLE_PACKET_ID, ((client, handler, buf, responseSender) -> {
             // Read the data from the packet
-            boolean seasonColorsEnabled = buf.readBoolean();
+            int seasonOrdinal = buf.readInt();
+            Season season = Season.values()[seasonOrdinal];
 
             // Execute on the main client thread
             client.execute(() -> {
-                SeasonColorManager.setSeasonColorsEnabled(seasonColorsEnabled);
+                SeasonColorManager.setCurrentSeason(season);
                 client.worldRenderer.reload();
             });
         }));

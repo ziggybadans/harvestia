@@ -2,7 +2,9 @@ package com.ziggybadans.harvestia.util;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.ziggybadans.harvestia.HarvestiaClient;
+import com.ziggybadans.harvestia.world.Season;
 import com.ziggybadans.harvestia.world.SeasonColorManager;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -19,26 +21,39 @@ public class ModCommands {
     }
 
     private static void registerSeasonCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("toggleSeasonColors")
+        dispatcher.register(CommandManager.literal("setSeason")
                 .requires(source -> source.hasPermissionLevel(2)) // Require OP level 2
-                .executes(context -> {
-                    SeasonColorManager.toggleSeasonColors(); // This method will toggle the season colors
-                    boolean newStatus = SeasonColorManager.isSeasonColorsEnabled();
-                    context.getSource().sendFeedback(() -> Text.literal("Season colors " + (newStatus ? "enabled" : "disabled")), false);
+                .then(CommandManager.argument("season", StringArgumentType.word())
+                        .suggests((context, builder) -> {
+                            for (Season season : Season.values()) {
+                                builder.suggest(season.name().toLowerCase());
+                            }
+                            return builder.buildFuture();
+                        })
+                        .executes(context -> {
+                            String seasonName = StringArgumentType.getString(context, "season");
+                            Season season = SeasonColorManager.setSeasonFromString(seasonName);
 
-                    // Create a packet to send to clients
-                    PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
-                    passedData.writeBoolean(newStatus);
+                            if (season != null) {
+                                context.getSource().sendFeedback(() -> Text.literal("Season set to " + seasonName), false);
 
-                    // Send to all connected players
-                    ServerCommandSource source = context.getSource();
-                    MinecraftServer server = source.getServer();
-                    if (server != null) {
-                        server.getPlayerManager().getPlayerList().forEach(player -> ServerPlayNetworking.send(player, HarvestiaClient.SEASON_COLOR_TOGGLE_PACKET_ID, passedData));
-                    }
+                                // Create a packet to send to all connected clients
+                                PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
+                                passedData.writeInt(season.ordinal());
 
-                    return Command.SINGLE_SUCCESS;
-                })
+                                // Send to all connected players
+                                ServerCommandSource source = context.getSource();
+                                MinecraftServer server = source.getServer();
+                                if (server != null) {
+                                    server.getPlayerManager().getPlayerList().forEach(player -> ServerPlayNetworking.send(player, HarvestiaClient.SEASON_COLOR_TOGGLE_PACKET_ID, passedData));
+                                }
+
+                                return Command.SINGLE_SUCCESS;
+                            } else {
+                                context.getSource().sendError(Text.literal("Invalid season: \"" + seasonName + "\""));
+                                return 0;
+                            }
+                        }))
         );
     }
 }
