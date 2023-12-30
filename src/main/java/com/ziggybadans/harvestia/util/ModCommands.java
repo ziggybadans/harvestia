@@ -5,7 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.ziggybadans.harvestia.HarvestiaClient;
 import com.ziggybadans.harvestia.world.Season;
-import com.ziggybadans.harvestia.world.SeasonColorManager;
+import com.ziggybadans.harvestia.world.SeasonSharedManager;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -13,9 +13,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.ServerWorldProperties;
 
 public class ModCommands {
     public static void register() {
@@ -23,8 +23,7 @@ public class ModCommands {
     }
 
     private static void registerSeasonCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        // Registration for setSeason
-        dispatcher.register(CommandManager.literal("setSeason")
+        dispatcher.register(CommandManager.literal("setseason")
                 .requires(source -> source.hasPermissionLevel(2)) // Require OP level 2
                 .then(CommandManager.argument("season", StringArgumentType.word())
                         .suggests((context, builder) -> {
@@ -35,7 +34,7 @@ public class ModCommands {
                         })
                         .executes(context -> {
                             String seasonName = StringArgumentType.getString(context, "season");
-                            Season season = SeasonColorManager.setSeasonFromString(seasonName);
+                            Season season = SeasonSharedManager.setSeasonFromString(seasonName);
 
                             if (season != null) {
                                 context.getSource().sendFeedback(() -> Text.literal("Season set to " + seasonName), false);
@@ -59,37 +58,36 @@ public class ModCommands {
                         }))
         );
 
-        // Registration for getSeason
-        dispatcher.register(CommandManager.literal("getSeason")
+        dispatcher.register(CommandManager.literal("getseason")
                 .executes(context -> {
-                    // Get the current season
-                    Season season = SeasonColorManager.getCurrentSeason();
-                    // Send feedback to the player
-                    context.getSource().sendFeedback(() -> Text.literal("Current season is " + season.name()), false);
+                    Season currentSeason = SeasonSharedManager.getCurrentSeason();
+                    context.getSource().sendFeedback(() -> Text.literal("Current season is " + currentSeason.name()), false);
                     return Command.SINGLE_SUCCESS;
-                })
-        );
+                }));
 
-        // Registration for getTemperature
-        dispatcher.register(CommandManager.literal("getTemperature")
+        dispatcher.register(CommandManager.literal("getraintime")
                 .executes(context -> {
-                    // Get the player and current biome temperature
                     ServerCommandSource source = context.getSource();
-                    // Ensure the command issuer is a player
-                    if (source.getEntity() instanceof ServerPlayerEntity player) {
-                        // Retrieve the biome at the player's position
-                        Biome biome = player.getWorld().getBiome(player.getBlockPos()).value();
+                    ServerWorld world = source.getWorld();
 
-                        // Get the temperature of the biome (not taking into account the BlockPos height adjustments)
-                        float adjustedTemperature = SeasonColorManager.getAdjustedBiomeTemperature(biome);
+                    // Obtain the ServerWorldProperties interface and get the rain time property
+                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+                    int rainTime = worldProperties.getRainTime();
 
-                        // Send feedback with the biome temperature to the player
-                        source.sendFeedback(() -> Text.literal(String.format("The current temperature in " + biome + " is %.2f", adjustedTemperature)), false);
-                    } else {
-                        source.sendError(Text.literal("You need to be a player to use this command!"));
-                    }
+                    // Send feedback with the rain time to the player
+                    source.sendFeedback(() -> Text.literal("Current rain time " + rainTime + " ticks"), false);
                     return Command.SINGLE_SUCCESS;
-                })
-        );
+                }));
+        dispatcher.register(CommandManager.literal("getcleartime")
+                .executes(context -> {
+                    ServerCommandSource source = context.getSource();
+                    ServerWorld world = source.getWorld();
+
+                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+                    int clearTime = worldProperties.getClearWeatherTime();
+
+                    source.sendFeedback(() -> Text.literal("Current clear time " + clearTime + " ticks"), false);
+                    return Command.SINGLE_SUCCESS;
+                }));
     }
 }

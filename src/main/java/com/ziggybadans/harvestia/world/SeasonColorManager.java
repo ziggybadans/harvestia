@@ -3,35 +3,15 @@ package com.ziggybadans.harvestia.world;
 import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockRenderView;
-import net.minecraft.world.biome.Biome;
 
 public class SeasonColorManager {
-    private static Season currentSeason = Season.SPRING;
-
-    public static void setCurrentSeason(Season season) {
-        currentSeason = season;
-    }
-
-    public static Season getCurrentSeason() {
-        return currentSeason;
-    }
-
-    public static Season setSeasonFromString(String seasonName) {
-        try {
-            Season parsedSeason = Season.valueOf(seasonName.toUpperCase());
-            setCurrentSeason(parsedSeason);
-            return parsedSeason;
-        } catch (IllegalArgumentException e) {
-            return null; // Invalid season string
-        }
-    }
 
     public static int getSeasonalColor(BlockRenderView world, BlockPos pos) {
         // Get the default biome color
         int biomeColor = BiomeColors.getFoliageColor(world, pos);
 
         // Calculate the color tint based on the current season
-        float[] seasonTint = getColorTintForSeason(currentSeason);
+        float[] seasonTint = getColorTintForSeason(SeasonSharedManager.getCurrentSeason());
 
         // Apply the tint to the biome color
         return applyColorTint(biomeColor, seasonTint);
@@ -55,7 +35,7 @@ public class SeasonColorManager {
             case SPRING -> new float[]{0.9f, 1.1f, 0.9f}; // Slightly green tint for spring
             case SUMMER -> new float[]{1f, 1f, 1f}; // No tint for summer
             case AUTUMN -> new float[]{1.2f, 0.8f, 0.4f}; // Orange/brown tint for autumn
-            case WINTER -> new float[]{0.8f, 0.9f, 1.1f}; // Slightly blue/cold tint for winter
+            case WINTER -> new float[]{0.8f, 0.7f, 1.1f}; // Slightly blue/cold tint for winter
             default -> new float[]{1f, 1f, 1f}; // Default as a fallback
         };
     }

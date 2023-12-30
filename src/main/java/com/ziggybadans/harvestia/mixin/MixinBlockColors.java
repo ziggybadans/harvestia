@@ -1,12 +1,11 @@
 package com.ziggybadans.harvestia.mixin;
 
 import com.ziggybadans.harvestia.world.SeasonColorManager;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.color.world.FoliageColors;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -17,11 +16,24 @@ public abstract class MixinBlockColors {
     private static void injectSeasonalLeavesColor(CallbackInfoReturnable<BlockColors> cir) {
         BlockColors blockColors = cir.getReturnValue();
 
-        // Update the color provider for oak leaves
-        blockColors.registerColorProvider((state, world, pos, tintIndex) -> {
-            // Use the Biome dependent foliage color for the world and position, and then apply the seasonal tint
-            //int biomeColor = world != null && pos != null ? BiomeColors.getFoliageColor(world, pos) : FoliageColors.getDefaultColor();
-            return world == null ? FoliageColors.getDefaultColor() : SeasonColorManager.getSeasonalColor(world, pos);
-        }, Blocks.OAK_LEAVES);
+        // Array of blocks
+        Block[] seasonalBlocks = new Block[] {
+                Blocks.OAK_LEAVES,
+                Blocks.BIRCH_LEAVES,
+                Blocks.SPRUCE_LEAVES,
+                Blocks.VINE,
+                Blocks.GRASS_BLOCK,
+                Blocks.GRASS,
+                Blocks.TALL_GRASS
+        };
+
+        for (Block block : seasonalBlocks) {
+            // Update the color provider for oak leaves
+            blockColors.registerColorProvider((state, world, pos, tintIndex) -> {
+                // Use the Biome dependent foliage color for the world and position, and then apply the seasonal tint
+                return world == null ? FoliageColors.getDefaultColor() : SeasonColorManager.getSeasonalColor(world, pos);
+            }, block);
+        }
+
     }
 }

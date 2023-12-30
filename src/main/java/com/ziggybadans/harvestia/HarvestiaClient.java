@@ -2,7 +2,7 @@ package com.ziggybadans.harvestia;
 
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.world.Season;
-import com.ziggybadans.harvestia.world.SeasonColorManager;
+import com.ziggybadans.harvestia.world.SeasonSharedManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -25,7 +25,7 @@ public class HarvestiaClient implements ClientModInitializer {
 
             // Execute on the main client thread
             client.execute(() -> {
-                SeasonColorManager.setCurrentSeason(season);
+                SeasonSharedManager.setCurrentSeason(season);
                 client.worldRenderer.reload();
             });
         }));
