@@ -5,8 +5,7 @@
 	"mixins": [
 		"ExampleMixin",
 		"MixinBiome",
-		"MixinBlockColors",
-		"MixinAbstractBlockState"
+		"MixinBlockColors"
 	],
 	"injectors": {
 		"defaultRequire": 1
