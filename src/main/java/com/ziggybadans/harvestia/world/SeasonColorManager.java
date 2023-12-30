@@ -17,19 +17,6 @@ public class SeasonColorManager {
         return applyColorTint(biomeColor, seasonTint);
     }
 
-    public static float getAdjustedBiomeTemperature(Biome biome) {
-        float originalTemperature = biome.getTemperature(); // Base biome temperature without BlockPos adjustment
-        return adjustTemperatureForSeason(originalTemperature);
-    }
-
-    private static float adjustTemperatureForSeason(float originalTemperature) {
-        return switch (getCurrentSeason()) {
-            case WINTER -> Math.max(originalTemperature - 0.15f, 0.0f);
-            case SUMMER -> Math.min(originalTemperature + 0.15f, 2.0f);
-            default -> originalTemperature;
-        };
-    }
-
     private static float[] getColorTintForSeason(Season season) {
         return switch (season) {
             case SPRING -> new float[]{0.9f, 1.1f, 0.9f}; // Slightly green tint for spring
