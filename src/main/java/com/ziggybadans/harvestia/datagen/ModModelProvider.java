@@ -2,7 +2,6 @@ package com.ziggybadans.harvestia.datagen;
 
 import com.ziggybadans.harvestia.block.CornCropBlock;
 import com.ziggybadans.harvestia.block.SweetPotatoCropBlock;
-import com.ziggybadans.harvestia.block.TomatoCropBlock;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -30,5 +29,6 @@ public class ModModelProvider extends FabricModelProvider {
         //itemModelGenerator.register(ModItems.TOMATO, Models.GENERATED);
         itemModelGenerator.register(ModItems.CORN, Models.GENERATED);
         itemModelGenerator.register(ModItems.BAKED_SWEET_POTATO, Models.GENERATED);
+        itemModelGenerator.register(ModItems.IRON_SCYTHE, Models.HANDHELD);
     }
 }
