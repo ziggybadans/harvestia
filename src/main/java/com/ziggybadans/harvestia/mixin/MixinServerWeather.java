@@ -5,35 +5,54 @@ import com.ziggybadans.harvestia.world.SeasonSharedManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.level.ServerWorldProperties;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerWorld.class)
-public class MixinServerWeather {
-    @Redirect(method = "tickWeather", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setClearWeatherTime(I)V"))
-    private void modifyClearWeatherTime(ServerWorldProperties serverWorldProperties, int clearTime) {
-        Season currentSeason = SeasonSharedManager.getCurrentSeason();
+public abstract class MixinServerWeather {
+    @Unique
+    private boolean lastWasRaining = false;
 
-        if (currentSeason == Season.SUMMER) {
-            if (!serverWorldProperties.isRaining()) {
-                clearTime = 500;
+    @Inject(method = "tickWeather", at = @At(value = "HEAD"))
+    private void onTickWeatherStart(CallbackInfo ci) {
+        ServerWorld self = (ServerWorld) (Object) this;
+        ServerWorldProperties properties = (ServerWorldProperties) self.getLevelProperties();
+
+        boolean currentlyRaining = self.isRaining();
+
+        // Only update weather times when the weather state changes
+        if (lastWasRaining != currentlyRaining) {
+            Season currentSeason = SeasonSharedManager.getCurrentSeason();
+
+            // Multipliers
+            float clearWeatherMultiplier = 1.0f;
+            float rainMultiplier = 1.0f;
+
+            switch (currentSeason) {
+                case SUMMER:
+                    clearWeatherMultiplier = 0.25f; // Clear weather periods are 4 times shorter in summer
+                    rainMultiplier = 0.5f; // Rain periods are twice as short in summer
+                    break;
+                // Add cases for other seasons if you want different adjustments
             }
-        }
 
-        serverWorldProperties.setClearWeatherTime(clearTime);
-    }
-    @Redirect(method = "tickWeather", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerWorldProperties;setRainTime(I)V"))
-    private void modifyRainTime(ServerWorldProperties serverWorldProperties, int rainTime) {
-        // Obtain the current season
-        Season currentSeason = SeasonSharedManager.getCurrentSeason();
-
-        // Adjust rain time based on season
-        if (currentSeason == Season.SUMMER) {
-            if (serverWorldProperties.isRaining()) {
-                rainTime = 1300;
+            // Adjust the weather times dynamically based on the current season
+            if (!currentlyRaining && lastWasRaining) {
+                // When it stops raining, adjust the clearWeatherTime
+                int baseClearTime = properties.getClearWeatherTime();
+                int adjustedClearTime = Math.max((int) (baseClearTime * clearWeatherMultiplier), 1);
+                properties.setClearWeatherTime(adjustedClearTime);
+            } else if (currentlyRaining && !lastWasRaining) {
+                // When it starts raining, adjust the rainTime
+                int baseRainTime = properties.getRainTime();
+                int adjustedRainTime = Math.max((int) (baseRainTime * rainMultiplier), 1);
+                properties.setRainTime(adjustedRainTime);
             }
-        }
 
-        serverWorldProperties.setRainTime(rainTime);
+            // Update the last known rain state
+            lastWasRaining = currentlyRaining;
+        }
     }
 }
