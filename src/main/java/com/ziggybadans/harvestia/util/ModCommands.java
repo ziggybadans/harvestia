@@ -13,7 +13,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.world.level.ServerWorldProperties;
 
 public class ModCommands {
     public static void register() {
@@ -60,6 +62,31 @@ public class ModCommands {
                 .executes(context -> {
                     Season currentSeason = SeasonSharedManager.getCurrentSeason();
                     context.getSource().sendFeedback(() -> Text.literal("Current season is " + currentSeason.name()), false);
+                    return Command.SINGLE_SUCCESS;
+                }));
+
+        dispatcher.register(CommandManager.literal("getraintime")
+                .executes(context -> {
+                    ServerCommandSource source = context.getSource();
+                    ServerWorld world = source.getWorld();
+
+                    // Obtain the ServerWorldProperties interface and get the rain time property
+                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+                    int rainTime = worldProperties.getRainTime();
+
+                    // Send feedback with the rain time to the player
+                    source.sendFeedback(() -> Text.literal("Current rain time " + rainTime + " ticks"), false);
+                    return Command.SINGLE_SUCCESS;
+                }));
+        dispatcher.register(CommandManager.literal("getcleartime")
+                .executes(context -> {
+                    ServerCommandSource source = context.getSource();
+                    ServerWorld world = source.getWorld();
+
+                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+                    int clearTime = worldProperties.getClearWeatherTime();
+
+                    source.sendFeedback(() -> Text.literal("Current clear time " + clearTime + " ticks"), false);
                     return Command.SINGLE_SUCCESS;
                 }));
     }
