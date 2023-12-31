@@ -29,6 +29,12 @@ public class ModModelProvider extends FabricModelProvider {
         //itemModelGenerator.register(ModItems.TOMATO, Models.GENERATED);
         itemModelGenerator.register(ModItems.CORN, Models.GENERATED);
         itemModelGenerator.register(ModItems.BAKED_SWEET_POTATO, Models.GENERATED);
+
+        itemModelGenerator.register(ModItems.WOOD_SCYTHE, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.STONE_SCYTHE, Models.HANDHELD);
         itemModelGenerator.register(ModItems.IRON_SCYTHE, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.GOLD_SCYTHE, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.DIAMOND_SCYTHE, Models.HANDHELD);
+        itemModelGenerator.register(ModItems.NETHERITE_SCYTHE, Models.HANDHELD);
     }
 }

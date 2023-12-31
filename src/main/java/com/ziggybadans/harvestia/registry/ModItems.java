@@ -24,8 +24,18 @@ public class ModItems {
     public static final Item BAKED_SWEET_POTATO = registerItem("baked_sweet_potato",
             new Item(new FabricItemSettings().food(ModFoodComponents.BAKED_SWEET_POTATO)));
 
+    public static final Item WOOD_SCYTHE = registerItem("wood_scythe",
+            new ScytheItem(ToolMaterials.WOOD, new FabricItemSettings()));
+    public static final Item STONE_SCYTHE = registerItem("stone_scythe",
+            new ScytheItem(ToolMaterials.STONE, new FabricItemSettings()));
     public static final Item IRON_SCYTHE = registerItem("iron_scythe",
             new ScytheItem(ToolMaterials.IRON, new FabricItemSettings()));
+        public static final Item GOLD_SCYTHE = registerItem("gold_scythe",
+            new ScytheItem(ToolMaterials.GOLD, new FabricItemSettings()));
+    public static final Item DIAMOND_SCYTHE = registerItem("diamond_scythe",
+            new ScytheItem(ToolMaterials.DIAMOND, new FabricItemSettings()));
+    public static final Item NETHERITE_SCYTHE = registerItem("netherite_scythe",
+            new ScytheItem(ToolMaterials.NETHERITE, new FabricItemSettings()));
 
     private static void addItemsToNaturalItemGroup(FabricItemGroupEntries entries) {
         entries.add(CORN_KERNALS);
@@ -37,7 +47,12 @@ public class ModItems {
     }
 
     private static void addItemsToToolItemGroup(FabricItemGroupEntries entries) {
+        entries.add(WOOD_SCYTHE);
+        entries.add(STONE_SCYTHE);
         entries.add(IRON_SCYTHE);
+        entries.add(GOLD_SCYTHE);
+        entries.add(DIAMOND_SCYTHE);
+        entries.add(NETHERITE_SCYTHE);
     }
 
     private static Item registerItem(String name, Item item) {
