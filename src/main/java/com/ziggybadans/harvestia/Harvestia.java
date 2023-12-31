@@ -3,8 +3,8 @@ package com.ziggybadans.harvestia;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
+import com.ziggybadans.harvestia.util.ScytheBlockBreakHandler;
 import net.fabricmc.api.ModInitializer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ public class Harvestia implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("harvestia");
+    public static final Logger LOGGER = LoggerFactory.getLogger("Harvestia");
 
 	@Override
 	public void onInitialize() {
@@ -26,5 +26,7 @@ public class Harvestia implements ModInitializer {
 		ModBlocks.registerModBlocks();
 
 		ModCommands.register();
+
+		ScytheBlockBreakHandler.register();
 	}
 }

@@ -6,5 +6,12 @@
   "item.harvestia.sweet_potato": "Sweet Potato",
   "item.harvestia.baked_sweet_potato": "Baked Sweet Potato",
 
+  "item.harvestia.wood_scythe": "Wooden Scythe",
+  "item.harvestia.stone_scythe": "Stone Scythe",
+  "item.harvestia.iron_scythe": "Iron Scythe",
+  "item.harvestia.gold_scythe": "Golden Scythe",
+  "item.harvestia.diamond_scythe": "Diamond Scythe",
+  "item.harvestia.netherite_scythe": "Netherite Scythe",
+
   "block.harvestia.rocky_stone": "Rocky Stone"
 }
