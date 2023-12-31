@@ -4,7 +4,12 @@ import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
 import com.ziggybadans.harvestia.util.ScytheBlockBreakHandler;
+import com.ziggybadans.harvestia.util.SeasonState;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.world.ServerWorld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,5 +33,20 @@ public class Harvestia implements ModInitializer {
 		ModCommands.register();
 
 		ScytheBlockBreakHandler.register();
+
+		ServerWorldEvents.LOAD.register((MinecraftServer server, ServerWorld world) -> {
+			SeasonState.get(server);
+		});
+		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
+		ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
+	}
+
+	private void onServerStarting(MinecraftServer server) {
+		SeasonState.get(server);
+	}
+
+	private void onServerStopping(MinecraftServer server) {
+		SeasonState.get(server).markDirty();
+		server.getOverworld().getPersistentStateManager().save();
 	}
 }
