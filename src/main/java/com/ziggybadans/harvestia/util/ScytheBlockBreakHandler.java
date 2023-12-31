@@ -82,7 +82,7 @@ public class ScytheBlockBreakHandler {
                         Integer age = currentState.contains(Properties.AGE_7) ? currentState.get(Properties.AGE_7) : null;
                         if (age == null || age >= 4) {
                             currentState.getBlock().onBreak(world, currentPos, currentState, player);
-                            world.breakBlock(currentPos, false, player);
+                            world.breakBlock(currentPos, true, player);
                         }
                     }
                 }
@@ -99,7 +99,7 @@ public class ScytheBlockBreakHandler {
 
                         if (!currentState.isAir() && (currentState.getBlock() == state.getBlock())) {
                             currentState.getBlock().onBreak(world, currentPos, currentState, player);
-                            world.breakBlock(currentPos, false, player);
+                            world.breakBlock(currentPos, true, player);
                         }
                     }
                 }
