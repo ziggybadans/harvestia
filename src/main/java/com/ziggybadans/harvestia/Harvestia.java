@@ -3,6 +3,7 @@ package com.ziggybadans.harvestia;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
+import com.ziggybadans.harvestia.util.ScytheBlockBreakHandler;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,5 +26,7 @@ public class Harvestia implements ModInitializer {
 		ModBlocks.registerModBlocks();
 
 		ModCommands.register();
+
+		ScytheBlockBreakHandler.register();
 	}
 }
