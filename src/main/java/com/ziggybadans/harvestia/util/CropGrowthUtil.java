@@ -1,5 +1,6 @@
 package com.ziggybadans.harvestia.util;
 
+import com.ziggybadans.harvestia.Harvestia;
 import com.ziggybadans.harvestia.world.CropConditions;
 import com.ziggybadans.harvestia.world.Season;
 import net.minecraft.block.Blocks;
@@ -18,11 +19,15 @@ public final class CropGrowthUtil {
 
         for (int x = -maxWaterDistance; x <= maxWaterDistance; x++) {
             for (int z = -maxWaterDistance; z <= maxWaterDistance; z++) {
-                BlockPos waterCheckPos = pos.add(x, 0, z);
+                BlockPos waterCheckPos = pos.add(x, -1, z);
                 if (world.getBlockState(waterCheckPos).getBlock() == Blocks.WATER) {
-                    int distance = Math.abs(x) + Math.abs(z);
-                    float moistureForThisBlock = 1.0f - (float)distance / maxWaterDistance;
-                    moistureValue = Math.max(moistureValue, moistureForThisBlock);
+                    int distance = Math.max(Math.abs(x), Math.abs(z));
+                    Harvestia.LOGGER.info("There is a water block " + distance + " blocks away");
+                    // Ensure distance is non-zero to prevent division by zero
+                    if (distance <= maxWaterDistance && distance > 0) {
+                        float moistureForThisBlock = 1.0f - (float)distance / maxWaterDistance;
+                        moistureValue = Math.max(moistureValue, moistureForThisBlock);
+                    }
                 }
             }
         }
@@ -48,7 +53,7 @@ public final class CropGrowthUtil {
 
     public static float getBiomeTemperature(float biomeTemperature) {
         // Map the [0, 1] range to [-30, 50] degrees Celsius
-        return -30.0f + (biomeTemperature * 80.0f);
+        return -15.0f + (biomeTemperature * 40.0f);
     }
 
     public static float getTemperatureGrowthModifier(CropConditions cropConditions, float temperature) {
@@ -74,16 +79,22 @@ public final class CropGrowthUtil {
 
     public static float getLightExposureGrowthModifier(CropConditions cropConditions, int currentLightLevel) {
         int optimalLightLevel = cropConditions.getOptimalLightLevel();
+        int lightLevelMin = optimalLightLevel - 2;
+        int lightLevelMax = optimalLightLevel + 2;
 
         // If the light level is at or above the optimal light level, no growth penalty
-        if (currentLightLevel >= optimalLightLevel) {
+        if (currentLightLevel >= optimalLightLevel && currentLightLevel <= lightLevelMax) {
             return 1.0f;
         }
 
-        // Compute the reduction in growth rate based on how far the light level falls short of the optimal level
-        int lightDeficit = optimalLightLevel - currentLightLevel;
+        // Compute the deviation from the tolerance range
+        int deviationFromOptimal = (currentLightLevel < lightLevelMin) ? lightLevelMin - currentLightLevel : currentLightLevel - lightLevelMax;
 
-        // Apply a modifier based on the deficit. You can adjust the formula to meet your game design.
-        return Math.max(0, 1.0f - (0.5f * lightDeficit));
+        // Apply a linear penalty proportional to the deviation. Here, we reduce growth rate by 10% per light level deviation.
+        // This rate can be changed depending on how severe you want the penalty to be.
+        float penaltyPerLevel = 0.1f;
+        float growthPenalty = penaltyPerLevel * deviationFromOptimal;
+
+        return Math.max(0, 1.0f - (growthPenalty));
     }
 }
