@@ -4,7 +4,7 @@ import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
 import com.ziggybadans.harvestia.util.ScytheBlockBreakHandler;
-import com.ziggybadans.harvestia.util.SeasonState;
+import com.ziggybadans.harvestia.world.SeasonState;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;

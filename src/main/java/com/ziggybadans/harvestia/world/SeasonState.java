@@ -1,8 +1,7 @@
-package com.ziggybadans.harvestia.util;
+package com.ziggybadans.harvestia.world;
 
 import com.ziggybadans.harvestia.Harvestia;
 import com.ziggybadans.harvestia.network.SeasonUpdatePacket;
-import com.ziggybadans.harvestia.world.Season;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
@@ -90,26 +89,36 @@ public class SeasonState extends PersistentState {
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
+        Harvestia.LOGGER.info("Writing NBT");
         nbt.putString("currentSeason", currentSeason.name());
+        Harvestia.LOGGER.info("Current season: " + currentSeason.name());
         nbt.putInt("daysInCurrentSeason", daysInCurrentSeason);
+        Harvestia.LOGGER.info("Days left in current season " + daysInCurrentSeason);
         nbt.putLong("lastDayTime", lastDayTime);
+        Harvestia.LOGGER.info("Last day time " + lastDayTime);
         nbt.putBoolean("seasonPaused", seasonPaused);
+        Harvestia.LOGGER.info("Season paused?: " + seasonPaused);
         return nbt;
     }
 
     public static SeasonState readNbt(NbtCompound nbt) {
+        Harvestia.LOGGER.info("Reading NBT");
         SeasonState state = new SeasonState();
         if (nbt.contains("currentSeason", 8)) {
             state.currentSeason = Season.valueOf(nbt.getString("currentSeason"));
+            Harvestia.LOGGER.info("Current season: " + state.currentSeason);
         }
         if (nbt.contains("daysInCurrentSeason")) {
             state.daysInCurrentSeason = nbt.getInt("daysInCurrentSeason");
+            Harvestia.LOGGER.info("Days left in current season: " + state.daysInCurrentSeason);
         }
         if (nbt.contains("lastDayTime")) {
             state.lastDayTime = nbt.getLong("lastDayTime");
+            Harvestia.LOGGER.info("Last day time: " + state.lastDayTime);
         }
         if (nbt.contains("seasonPaused")) {
             state.seasonPaused = nbt.getBoolean("seasonPaused");
+            Harvestia.LOGGER.info("Season paused?: " + state.seasonPaused);
         }
         return state;
     }

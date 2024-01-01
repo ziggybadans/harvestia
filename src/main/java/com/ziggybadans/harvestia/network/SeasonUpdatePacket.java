@@ -1,7 +1,7 @@
 package com.ziggybadans.harvestia.network;
 
 import com.ziggybadans.harvestia.Harvestia;
-import com.ziggybadans.harvestia.util.SeasonState;
+import com.ziggybadans.harvestia.world.SeasonState;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
