@@ -54,7 +54,7 @@ public class Harvestia implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			PacketByteBuf packetByteBuf = SeasonUpdatePacket.createPacket(SeasonState.get(server));
 			ServerPlayNetworking.send(handler.player, SeasonUpdatePacket.CHANNEL_NAME, packetByteBuf);
-			Harvestia.LOGGER.info("Sent season update to player: " + handler.player.getName().getString());
+			//Harvestia.LOGGER.info("Sent season update to player: " + handler.player.getName().getString());
 		});
 	}
 

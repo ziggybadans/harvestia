@@ -21,11 +21,11 @@ public class HarvestiaClient implements ClientModInitializer {
 
         ClientPlayNetworking.registerGlobalReceiver(SeasonUpdatePacket.CHANNEL_NAME, ((client, handler, buf, responseSender) -> {
             String seasonName = buf.readString(32767);
-            Harvestia.LOGGER.info("(HarvestiaClient) Received season update: " + seasonName);
+            //Harvestia.LOGGER.info("(HarvestiaClient) Received season update: " + seasonName);
 
             client.execute(() -> {
                 currentClientSeason = Season.valueOf(seasonName);
-                Harvestia.LOGGER.info("(HarvestiaClient) Updating client season to: " + currentClientSeason);
+                //Harvestia.LOGGER.info("(HarvestiaClient) Updating client season to: " + currentClientSeason);
                 client.worldRenderer.reload();
             });
         }));
@@ -36,7 +36,7 @@ public class HarvestiaClient implements ClientModInitializer {
                     String seasonName = buf.readString(32767);
                     client.execute(() -> {
                         currentClientSeason = Season.valueOf(seasonName);
-                        Harvestia.LOGGER.info("(HarvestiaClient) Updating client season to: " + currentClientSeason);
+                        //Harvestia.LOGGER.info("(HarvestiaClient) Updating client season to: " + currentClientSeason);
                         client.worldRenderer.reload();
                     });
                 });
@@ -45,7 +45,7 @@ public class HarvestiaClient implements ClientModInitializer {
     }
 
     public static Season getCurrentClientSeason(MinecraftClient client) {
-        Harvestia.LOGGER.info("getCurrentClientSeason called, returning " + currentClientSeason);
+        //Harvestia.LOGGER.info("getCurrentClientSeason called, returning " + currentClientSeason);
         return currentClientSeason != null ? currentClientSeason : Season.SPRING;
     }
 }
