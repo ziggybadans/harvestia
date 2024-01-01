@@ -43,13 +43,24 @@ public abstract class CropBlockMixin extends Block {
         float moistureGrowthChance = CropGrowthUtil.getMoistureGrowthChance(cropConditions, moistureLevel);
         float temperatureGrowthChance = CropGrowthUtil.getTemperatureGrowthModifier(cropConditions, temperature);
         float lightExposureGrowthModifier = CropGrowthUtil.getLightExposureGrowthModifier(cropConditions, lightLevel);
+        float hardinessGrowthModifier = cropConditions.getHardiness();
 
-        float growthChance = seasonGrowthChance * moistureGrowthChance * temperatureGrowthChance * lightExposureGrowthModifier;
+        float growthChance = seasonGrowthChance * moistureGrowthChance * temperatureGrowthChance * lightExposureGrowthModifier * hardinessGrowthModifier;
         Harvestia.LOGGER.info("Growth chance: " + growthChance);
 
-        if (random.nextFloat() >= growthChance) {
-            Harvestia.LOGGER.info("Cancelled tick for " + block);
-            ci.cancel();
+        while (growthChance > 0) {
+            if (random.nextFloat() < Math.min(growthChance, 1.0f)) {
+                // Apply one instance of growth
+                state = state.with(CropBlock.AGE, Math.min(state.get(CropBlock.AGE) + 1, ((CropBlock)(Object)this).getMaxAge()));
+            }
+            // Decrement growthChance by 1 because we've processed one simulated growth tick
+            growthChance -= 1.0f;
         }
+
+        // Set the final state on the world
+        world.setBlockState(pos, state, 3);
+
+        // Cancel the original random tick behavior, since we've handled it manually
+        ci.cancel();
     }
 }

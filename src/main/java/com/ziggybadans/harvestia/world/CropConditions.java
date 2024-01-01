@@ -9,14 +9,16 @@ public class CropConditions {
     private float optimalMinTemperature;
     private float optimalMaxTemperature;
     private int optimalLightLevel;
+    private float hardiness;
 
     // Default conditions if a crop hasn't been registered
-    public CropConditions(EnumSet<Season> viableSeasons, float preferredMoisture, float optimalMinTemperature, float optimalMaxTemperature, int optimalLightLevel) {
+    public CropConditions(EnumSet<Season> viableSeasons, float preferredMoisture, float optimalMinTemperature, float optimalMaxTemperature, int optimalLightLevel, float hardiness) {
         this.viableSeasons = viableSeasons;
         this.preferredMoisture = preferredMoisture;
         this.optimalMinTemperature = optimalMinTemperature;
         this.optimalMaxTemperature = optimalMaxTemperature;
         this.optimalLightLevel = optimalLightLevel;
+        this.hardiness = hardiness;
     }
 
     public boolean canGrowIn(Season currentSeason) {
@@ -37,6 +39,10 @@ public class CropConditions {
 
     public int getOptimalLightLevel() {
         return optimalLightLevel;
+    }
+
+    public float getHardiness() {
+        return hardiness;
     }
 
     private static final List<Season> ORDERED_SEASONS = List.of(Season.SPRING, Season.SUMMER, Season.AUTUMN, Season.WINTER);
