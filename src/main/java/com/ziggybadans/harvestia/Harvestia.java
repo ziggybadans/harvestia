@@ -41,7 +41,7 @@ public class Harvestia implements ModInitializer {
 
 		ScytheBlockBreakHandler.register();
 
-		CropConditionRegistry.setupSeasonalityRegistry();
+		CropConditionRegistry.setupRegistry();
 
 		ServerWorldEvents.LOAD.register((MinecraftServer server, ServerWorld world) -> {
 			SeasonState.get(server);

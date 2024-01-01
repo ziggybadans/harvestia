@@ -1,10 +1,13 @@
 package com.ziggybadans.harvestia.block;
 
+import com.ziggybadans.harvestia.HarvestiaClient;
 import com.ziggybadans.harvestia.registry.CropConditionRegistry;
 import com.ziggybadans.harvestia.world.CropConditions;
+import com.ziggybadans.harvestia.world.Season;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CropBlock;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -19,14 +22,25 @@ public class CustomCropBlock extends CropBlock {
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         super.randomTick(state, world, pos, random);
 
+        // Retrieve the current season of the world
+        MinecraftClient client = MinecraftClient.getInstance();
+        Season currentSeason = HarvestiaClient.getCurrentClientSeason(client);
+
         // Retrieve the crop conditions from the registry
         CropConditions cropConditions = CropConditionRegistry.getConditionsForCrop(state.getBlock());
 
         // Calculate the moisture level
         float moistureLevel = calculateMoistureLevel(world, pos);
 
+        // Calculate the growth chance modifiers
+        float seasonGrowthChance = calculateSeasonGrowthChance(cropConditions, currentSeason);
+        float moistureGrowthChance = getMoistureGrowthChance(cropConditions, moistureLevel);
+
+        // Calculate the overall growth chance
+        float growthChance = seasonGrowthChance * moistureGrowthChance;
+
         // Decide if the crop should grow based on the moisture level
-        if (shouldGrow(random, cropConditions, moistureLevel)) {
+        if (random.nextFloat() < growthChance) {
             applyGrowth(world, pos, state);
         }
     }
@@ -48,21 +62,20 @@ public class CustomCropBlock extends CropBlock {
         return moistureValue;
     }
 
-    private boolean shouldGrow(Random random, CropConditions cropConditions, float moistureLevel) {
-        // Here we check if the moisture level is acceptable for this crop
+    private float calculateSeasonGrowthChance(CropConditions cropConditions, Season currentSeason) {
+        // Get the distance from the preferred season(s)
+        int seasonDistance = cropConditions.getSeasonDistance(currentSeason);
+
+        // Convert this distance to an exponential chance (decay rate can be adjusted as needed)
+        double decayRate = 2.0; // The base of the exponential decay, can be tweaked for balance
+        return (float) Math.pow(decayRate, -seasonDistance);
+    }
+
+    private float getMoistureGrowthChance(CropConditions cropConditions, float moistureLevel) {
         float preferredMoisture = cropConditions.getPreferredMoisture();
         float moistureDifference = Math.abs(preferredMoisture - moistureLevel);
 
-        // The chance for the crop to grow could be affected by the difference in moisture level.
-        // For now, we're using a simple linear model for growth reduction.
-        float growthChanceModifier = 1.0f - moistureDifference; // Simple linear stifling of growth
-
-        // Ensure the modifier is between 0 and 1
-        growthChanceModifier = Math.max(0, Math.min(growthChanceModifier, 1));
-
-        // If we're using seasonality or other conditions, we should check them here as well
-
-        // Using randomness to determine if growth should occur; this can be modified for different growth mechanics
-        return random.nextFloat() < growthChanceModifier;
+        // Linear stifling of growth for moisture, as before
+        return Math.max(0, 1.0f - moistureDifference);
     }
 }
