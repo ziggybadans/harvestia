@@ -1,5 +1,6 @@
 package com.ziggybadans.harvestia.world;
 
+import java.util.Collections;
 import java.util.EnumSet;
 
 public class CropSeasonality {
@@ -7,9 +8,7 @@ public class CropSeasonality {
 
     public CropSeasonality(Season... seasons) {
         viableSeasons = EnumSet.noneOf(Season.class);
-        for (Season season : seasons) {
-            viableSeasons.add(season);
-        }
+        Collections.addAll(viableSeasons, seasons);
     }
 
     public boolean canGrowIn(Season currentSeason) {

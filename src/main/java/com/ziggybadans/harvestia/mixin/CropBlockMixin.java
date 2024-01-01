@@ -1,5 +1,6 @@
 package com.ziggybadans.harvestia.mixin;
 
+import com.ziggybadans.harvestia.Harvestia;
 import com.ziggybadans.harvestia.HarvestiaClient;
 import com.ziggybadans.harvestia.registry.CropSeasonalityRegistry;
 import com.ziggybadans.harvestia.world.CropSeasonality;
@@ -24,13 +25,16 @@ public class CropBlockMixin extends Block {
 
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     public void onRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
+
         MinecraftClient client = MinecraftClient.getInstance();
         Season currentSeason = HarvestiaClient.getCurrentClientSeason(client);
         Block block = state.getBlock();
 
         CropSeasonality cropSeasonality = CropSeasonalityRegistry.getSeasonalityForCrop(block);
+        //Harvestia.LOGGER.info("Attempting random tick for " + block + ": " + cropSeasonality);
         if (cropSeasonality != null && !cropSeasonality.canGrowIn(currentSeason)) {
             ci.cancel();
+            Harvestia.LOGGER.info("Cancelled tick for crop " + block);
         }
     }
 }
