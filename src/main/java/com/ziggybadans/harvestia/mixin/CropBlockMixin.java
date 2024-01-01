@@ -26,9 +26,11 @@ public abstract class CropBlockMixin extends Block {
 
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     public void onRandomTick(BlockState state, ServerWorld world, BlockPos pos, Random random, CallbackInfo ci) {
-        CropBlock block = (CropBlock)(Object)this;
         MinecraftClient client = MinecraftClient.getInstance();
         Season currentSeason = HarvestiaClient.getCurrentClientSeason(client);
+
+        CropBlock block = (CropBlock)(Object)this;
+        int lightLevel = world.getLightLevel(pos, 0);
 
         CropConditions cropConditions = CropConditionRegistry.getConditionsForCrop(block);
 
@@ -38,8 +40,9 @@ public abstract class CropBlockMixin extends Block {
         float seasonGrowthChance = CropGrowthUtil.calculateSeasonGrowthChance(cropConditions, currentSeason);
         float moistureGrowthChance = CropGrowthUtil.getMoistureGrowthChance(cropConditions, moistureLevel);
         float temperatureGrowthChance = CropGrowthUtil.getTemperatureGrowthModifier(cropConditions, temperature);
+        float lightExposureGrowthModifier = CropGrowthUtil.getLightExposureGrowthModifier(cropConditions, lightLevel);
 
-        float growthChance = seasonGrowthChance * moistureGrowthChance * temperatureGrowthChance;
+        float growthChance = seasonGrowthChance * moistureGrowthChance * temperatureGrowthChance * lightExposureGrowthModifier;
 
         if (random.nextFloat() >= growthChance) {
             Harvestia.LOGGER.info("Cancelled tick for " + block);

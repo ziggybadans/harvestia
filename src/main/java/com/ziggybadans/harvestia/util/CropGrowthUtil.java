@@ -71,4 +71,19 @@ public final class CropGrowthUtil {
         // Convert the difference to an exponential decay modifier
         return (float) Math.pow(decayRate, -temperatureDifference);
     }
+
+    public static float getLightExposureGrowthModifier(CropConditions cropConditions, int currentLightLevel) {
+        int optimalLightLevel = cropConditions.getOptimalLightLevel();
+
+        // If the light level is at or above the optimal light level, no growth penalty
+        if (currentLightLevel >= optimalLightLevel) {
+            return 1.0f;
+        }
+
+        // Compute the reduction in growth rate based on how far the light level falls short of the optimal level
+        int lightDeficit = optimalLightLevel - currentLightLevel;
+
+        // Apply a modifier based on the deficit. You can adjust the formula to meet your game design.
+        return Math.max(0, 1.0f - (0.5f * lightDeficit));
+    }
 }
