@@ -10,7 +10,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.world.level.ServerWorldProperties;
 
 public class ModCommands {
     public static void register() {
@@ -57,6 +59,31 @@ public class ModCommands {
                                         })
                                 )
                         )
+                        .then(CommandManager.literal("weather")
+                                .then(CommandManager.literal("clear")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            ServerWorld world = source.getWorld();
+                                            ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+
+                                            int clearTime = worldProperties.getClearWeatherTime();
+                                            source.sendFeedback(() -> Text.literal("Time until rain: " + clearTime + " ticks"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(CommandManager.literal("rain")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            ServerWorld world = source.getWorld();
+                                            ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+
+                                            int rainTime = worldProperties.getRainTime();
+                                            source.sendFeedback(() -> Text.literal("Time until clear weather: " + rainTime + " ticks"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        })))
                 )
                 .then(CommandManager.literal("set")
                         .then(CommandManager.argument("season", StringArgumentType.word())
