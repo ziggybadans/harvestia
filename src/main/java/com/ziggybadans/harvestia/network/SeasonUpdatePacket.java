@@ -10,8 +10,10 @@ public class SeasonUpdatePacket {
     public static final Identifier CHANNEL_NAME = new Identifier(Harvestia.MOD_ID, "season_update");
 
     public static PacketByteBuf createPacket(SeasonState seasonState) {
+        Harvestia.LOGGER.info("(SeasonUpdatePacket) Creating packet...");
         PacketByteBuf byteBuf = PacketByteBufs.create();
         byteBuf.writeString(seasonState.getCurrentSeason().name());
+        Harvestia.LOGGER.info("(SeasonUpdatePacket) Packet string is: " + seasonState.getCurrentSeason().name());
         return byteBuf;
     }
 }

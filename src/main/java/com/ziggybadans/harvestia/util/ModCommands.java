@@ -3,6 +3,7 @@ package com.ziggybadans.harvestia.util;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.ziggybadans.harvestia.Harvestia;
 import com.ziggybadans.harvestia.world.Season;
 import com.ziggybadans.harvestia.world.SeasonState;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -69,6 +70,7 @@ public class ModCommands {
                                     try {
                                         Season season = Season.valueOf(seasonName);
                                         state.setCurrentSeason(season, server);
+                                        Harvestia.LOGGER.info("(ModCommands) Set season to " + season + " on server " + server);
                                         source.sendFeedback(() -> Text.literal("Season set to " + season.getName()), false);
                                     } catch (IllegalArgumentException e) {
                                         source.sendError(Text.literal("Invalid season name. Use one of: spring, summer, autumn, winter"));

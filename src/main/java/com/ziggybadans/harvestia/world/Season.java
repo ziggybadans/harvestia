@@ -1,21 +1,23 @@
 package com.ziggybadans.harvestia.world;
 
 public enum Season {
-    SPRING("Spring", 0.9f, 1.1f, 0.9f),
-    SUMMER("Summer", 1f, 1f, 1f),
-    AUTUMN("Autumn", 1.2f, 0.8f, 0.4f),
-    WINTER("Winter", 0.8f, 0.7f, 1.1f);
+    SPRING("Spring", 0.9f, 1.1f, 0.9f, 0.0f),
+    SUMMER("Summer", 1f, 1f, 1f, 0.5f),
+    AUTUMN("Autumn", 1.2f, 0.8f, 0.4f, -0.2f),
+    WINTER("Winter", 0.8f, 0.7f, 1.1f, -1.0f);
 
     private final String name;
     private final float redTint;
     private final float greenTint;
     private final float blueTint;
+    private final float temperatureModifier;
 
-    Season(String name, float redTint, float greenTint, float blueTint) {
+    Season(String name, float redTint, float greenTint, float blueTint, float temperatureModifier) {
         this.name = name;
         this.redTint = redTint;
         this.greenTint = greenTint;
         this.blueTint = blueTint;
+        this.temperatureModifier = temperatureModifier;
     }
 
     public String getName() {
@@ -29,5 +31,11 @@ public enum Season {
     }
     public float getBlueTint() {
         return blueTint;
+    }
+    public float getTemperatureModifier() {
+        return temperatureModifier;
+    }
+    public boolean changeToSnow() {
+        return temperatureModifier <= 0.15f;
     }
 }

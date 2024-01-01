@@ -1,5 +1,6 @@
 package com.ziggybadans.harvestia;
 
+import com.ziggybadans.harvestia.network.SeasonUpdatePacket;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
@@ -9,6 +10,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
@@ -45,13 +49,18 @@ public class Harvestia implements ModInitializer {
 			if (world.getRegistryKey().equals(World.OVERWORLD)) {
 				SeasonState seasonState = SeasonState.get(world.getServer());
 				seasonState.tick(world.getServer());
-			} else {
 			}
+		});
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			PacketByteBuf packetByteBuf = SeasonUpdatePacket.createPacket(SeasonState.get(server));
+			ServerPlayNetworking.send(handler.player, SeasonUpdatePacket.CHANNEL_NAME, packetByteBuf);
+			Harvestia.LOGGER.info("Sent season update to player: " + handler.player.getName().getString());
 		});
 	}
 
 	private void onServerStarting(MinecraftServer server) {
-		SeasonState.get(server);
+		SeasonState state = SeasonState.get(server);
+		state.sendSeasonUpdateToAllPlayers(server);
 	}
 
 	private void onServerStopping(MinecraftServer server) {

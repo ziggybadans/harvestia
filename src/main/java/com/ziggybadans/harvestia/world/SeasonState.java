@@ -69,20 +69,21 @@ public class SeasonState extends PersistentState {
     }
 
     public Season getCurrentSeason() {
+        //Harvestia.LOGGER.info("(SeasonState) Current season is " + currentSeason);
         return currentSeason;
     }
 
     public void setCurrentSeason(Season currentSeason, MinecraftServer server) {
-        Harvestia.LOGGER.info("Setting current season to: " + currentSeason);
+        Harvestia.LOGGER.info("(SeasonState) Sending update to players for setting season to " + currentSeason);
         this.currentSeason = currentSeason;
         this.setDirty(true);
         sendSeasonUpdateToAllPlayers(server);
     }
 
-    private void sendSeasonUpdateToAllPlayers(MinecraftServer server) {
+    public void sendSeasonUpdateToAllPlayers(MinecraftServer server) {
         PacketByteBuf packetByteBuf = SeasonUpdatePacket.createPacket(this);
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            Harvestia.LOGGER.info("Sending season update to player: " + player.getName().getString());
+            Harvestia.LOGGER.info("(SeasonState) Sending season update to player: " + player.getName().getString());
             ServerPlayNetworking.send(player, SeasonUpdatePacket.CHANNEL_NAME, packetByteBuf);
         }
     }
