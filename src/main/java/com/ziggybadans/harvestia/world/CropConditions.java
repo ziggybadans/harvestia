@@ -6,11 +6,15 @@ import java.util.List;
 public class CropConditions {
     private final EnumSet<Season> viableSeasons;
     private final float preferredMoisture;
+    private float optimalMinTemperature;
+    private float optimalMaxTemperature;
 
     // Default conditions if a crop hasn't been registered
-    public CropConditions(EnumSet<Season> viableSeasons, float preferredMoisture) {
+    public CropConditions(EnumSet<Season> viableSeasons, float preferredMoisture, float optimalMinTemperature, float optimalMaxTemperature) {
         this.viableSeasons = viableSeasons;
         this.preferredMoisture = preferredMoisture;
+        this.optimalMinTemperature = optimalMinTemperature;
+        this.optimalMaxTemperature = optimalMaxTemperature;
     }
 
     public boolean canGrowIn(Season currentSeason) {
@@ -19,6 +23,14 @@ public class CropConditions {
 
     public float getPreferredMoisture() {
         return preferredMoisture;
+    }
+
+    public float getOptimalMinTemperature() {
+        return optimalMinTemperature;
+    }
+
+    public float getOptimalMaxTemperature() {
+        return optimalMaxTemperature;
     }
 
     private static final List<Season> ORDERED_SEASONS = List.of(Season.SPRING, Season.SUMMER, Season.AUTUMN, Season.WINTER);
