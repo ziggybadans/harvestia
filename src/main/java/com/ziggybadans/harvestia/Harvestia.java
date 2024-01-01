@@ -49,6 +49,7 @@ public class Harvestia implements ModInitializer {
 			if (world.getRegistryKey().equals(World.OVERWORLD)) {
 				SeasonState seasonState = SeasonState.get(world.getServer());
 				seasonState.tick(world.getServer());
+				//Harvestia.LOGGER.info("Tick for END_WORLD_TICK to call SeasonState");
 			}
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

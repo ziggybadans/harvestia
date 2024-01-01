@@ -19,7 +19,7 @@ public class SeasonState extends PersistentState {
 
     public void tick(MinecraftServer server) {
         if (seasonPaused) {
-            //Harvestia.LOGGER.info("Season transitions are currently paused.");
+            Harvestia.LOGGER.info("Season transitions are currently paused.");
             return;
         }
         WorldProperties properties = server.getOverworld().getLevelProperties();
@@ -32,7 +32,7 @@ public class SeasonState extends PersistentState {
             Harvestia.LOGGER.info("New day in current season: " + daysInCurrentSeason + " out of " + SEASON_LENGTH);
 
             if (daysInCurrentSeason >= SEASON_LENGTH) {
-                //Harvestia.LOGGER.info("Transitioning to next season.");
+                Harvestia.LOGGER.info("Transitioning to next season.");
                 transitionToNextSeason(server);
             }
         }
@@ -55,7 +55,7 @@ public class SeasonState extends PersistentState {
 
         // Mark state as dirty to ensure it's saved
         setDirty(true);
-        //Harvestia.LOGGER.info("Transitioned to new season: " + currentSeason);
+        Harvestia.LOGGER.info("Transitioned to new season: " + currentSeason);
 
         sendSeasonUpdateToAllPlayers(server);
     }
