@@ -6,6 +6,7 @@
     "BiomeMixin",
     "CropBlockMixin",
     "ExampleMixin",
+    "ItemMixin",
     "ServerWeatherMixin"
   ],
   "injectors": {

@@ -21,6 +21,10 @@ public class CropConditions {
         this.hardiness = hardiness;
     }
 
+    public EnumSet<Season> getSeason() {
+        return viableSeasons;
+    }
+
     public boolean canGrowIn(Season currentSeason) {
         return viableSeasons.contains(currentSeason);
     }

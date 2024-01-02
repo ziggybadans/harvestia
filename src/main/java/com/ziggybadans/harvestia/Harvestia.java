@@ -2,6 +2,7 @@ package com.ziggybadans.harvestia;
 
 import com.ziggybadans.harvestia.network.SeasonUpdatePacket;
 import com.ziggybadans.harvestia.registry.CropConditionRegistry;
+import com.ziggybadans.harvestia.registry.DiseaseRegistry;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.ModCommands;
@@ -42,6 +43,7 @@ public class Harvestia implements ModInitializer {
 		ScytheBlockBreakHandler.register();
 
 		CropConditionRegistry.setupRegistry();
+		DiseaseRegistry.setupRegistry();
 
 		ServerWorldEvents.LOAD.register((MinecraftServer server, ServerWorld world) -> {
 			SeasonState.get(server);
