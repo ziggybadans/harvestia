@@ -21,8 +21,19 @@ public class CropConditions {
         this.hardiness = hardiness;
     }
 
-    public EnumSet<Season> getSeason() {
-        return viableSeasons;
+    public String getSeason() {
+        StringBuilder output = new StringBuilder();
+
+        for (Season season : viableSeasons) {
+            String seasonString = season.getName();
+            if (output.isEmpty()) {
+                output.append(seasonString);
+            } else {
+                output.append(", ").append(seasonString);
+            }
+        }
+
+        return output.toString();
     }
 
     public boolean canGrowIn(Season currentSeason) {

@@ -23,13 +23,4 @@ public class Disease {
     public String getName() {
         return name;
     }
-
-    public boolean canInfect(Block crop, int lightLevel, float moistureLevel, float temperature) {
-        boolean canAffectCrop = affectedCrops.contains(crop) || affectedCrops.isEmpty();
-        boolean inFavoredLightLevel = favoredLightLevels.contains(lightLevel);
-        boolean inFavoredMoistureLevel = favoredMoistureLevels.contains(moistureLevel);
-        boolean inFavoredTemperatureRange = favoredTemperatureRange.contains(temperature);
-
-        return canAffectCrop && inFavoredLightLevel && inFavoredMoistureLevel && inFavoredTemperatureRange;
-    }
 }

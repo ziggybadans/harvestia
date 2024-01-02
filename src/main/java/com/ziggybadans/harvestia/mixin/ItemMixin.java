@@ -33,7 +33,7 @@ public class ItemMixin {
                     tooltip.add(Text.literal("Moisture: " + cropConditions.getPreferredMoisture()));
                     tooltip.add(Text.literal("Temperature: " + cropConditions.getOptimalMinTemperature() + " to " + cropConditions.getOptimalMaxTemperature()));
                     tooltip.add(Text.literal("Light Exposure: " + cropConditions.getOptimalLightLevel()));
-                    tooltip.add(Text.literal("Hardiness:" + cropConditions.getHardiness()));
+                    tooltip.add(Text.literal("Hardiness: " + cropConditions.getHardiness()));
                 }
             }
         }

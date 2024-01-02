@@ -1,10 +1,10 @@
 package com.ziggybadans.harvestia;
 
-import com.ziggybadans.harvestia.registry.CropConditionRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
@@ -19,36 +19,35 @@ public class OverlayRenderer {
             MinecraftClient client = MinecraftClient.getInstance();
 
             // Set position and size of the overlay
-            int x = 10;
-            int y = scaledHeight - 100;
+            int x = 100;
+            int y = scaledHeight - 125;
             MutableText cropInfo = Text.empty();
 
-            // Append lines of text for each piece of information
-            cropInfo.append("Crop: " + crop.getName()).append("\n");
-            cropInfo.append("Moisture: " + CropConditionRegistry.getConditionsForCrop(crop));
+            // The individual lines of text to render
+            String cropDisplayName = "Crop: " + Registries.BLOCK.getId(crop).getPath().toUpperCase().charAt(0) + (Registries.BLOCK.getId(crop).getPath().substring(1));
+            String testInfo = "Test";
 
-            // Calculate background size
-            int textWidth = textRenderer.getWidth(cropInfo);
-            int textHeight = textRenderer.fontHeight * 2;
+            int lineHeight = textRenderer.fontHeight;
             int backgroundPadding = 3;
+
+            int maxTextWidth = Math.max(textRenderer.getWidth(cropDisplayName), textRenderer.getWidth(testInfo));
+            int totalTextHeight = (lineHeight + backgroundPadding) * 2;
+
+            int backgroundColor = 0x80A0A0A0;
 
             // Render background box
             drawContext.fill(
                     x - backgroundPadding,
                     y - backgroundPadding,
-                    x + textWidth + backgroundPadding,
-                    y + textHeight + backgroundPadding,
-                    client.options.getTextBackgroundColor(0)
+                    x + maxTextWidth + backgroundPadding * 2,
+                    y + totalTextHeight + backgroundPadding,
+                    backgroundColor
             );
 
-            // Render text with shadow
-            drawContext.drawTextWithShadow(
-                    textRenderer,
-                    cropInfo,
-                    x,
-                    y,
-                    0xFFFFFF
-            );
+            // Render text line by line with shadow
+            drawContext.drawTextWithShadow(textRenderer, Text.literal(cropDisplayName), x, y, 0xFFFFFF);
+            y += lineHeight + backgroundPadding; // Move to next line
+            drawContext.drawTextWithShadow(textRenderer, Text.literal(testInfo), x, y, 0xFFFFFF);
 
             crop = null;
         }
