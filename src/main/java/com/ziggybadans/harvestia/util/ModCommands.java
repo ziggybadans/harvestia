@@ -3,13 +3,10 @@ package com.ziggybadans.harvestia.util;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.ziggybadans.harvestia.HarvestiaClient;
 import com.ziggybadans.harvestia.world.Season;
-import com.ziggybadans.harvestia.world.SeasonSharedManager;
-import io.netty.buffer.Unpooled;
+import com.ziggybadans.harvestia.world.SeasonState;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -19,75 +16,127 @@ import net.minecraft.world.level.ServerWorldProperties;
 
 public class ModCommands {
     public static void register() {
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> registerSeasonCommand(dispatcher)));
+        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> registerSeasonCommands(dispatcher)));
     }
 
-    private static void registerSeasonCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("setseason")
-                .requires(source -> source.hasPermissionLevel(2)) // Require OP level 2
-                .then(CommandManager.argument("season", StringArgumentType.word())
-                        .suggests((context, builder) -> {
-                            for (Season season : Season.values()) {
-                                builder.suggest(season.name().toLowerCase());
-                            }
-                            return builder.buildFuture();
-                        })
+    private static void registerSeasonCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(CommandManager.literal("season")
+                .then(CommandManager.literal("get")
+                        .then(CommandManager.literal("current")
+                                .executes(context -> {
+                                    ServerCommandSource source = context.getSource();
+                                    MinecraftServer server= source.getServer();
+                                    SeasonState state = SeasonState.get(server);
+                                    source.sendFeedback(() -> Text.literal("Current season is " + state.getCurrentSeason().getName()), false);
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                        .then(CommandManager.literal("time")
+                                .then(CommandManager.literal("days")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            int daysRemaining = SeasonState.SEASON_LENGTH - state.getDaysInCurrentSeason();
+                                            source.sendFeedback(() -> Text.literal("Time until next season " + daysRemaining + " days"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
+                                .then(CommandManager.literal("ticks")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            long currentTime = server.getOverworld().getLevelProperties().getTimeOfDay();
+                                            long lastDayTime = state.getLastDayTime();
+                                            long ticksSpentCurrentDay = currentTime - lastDayTime;
+
+                                            // Calculate total ticks remaining until the next season
+                                            long totalTicksRemaining = (SeasonState.SEASON_LENGTH * 24000 - state.getDaysInCurrentSeason() * 24000 + 24000 - ticksSpentCurrentDay);
+
+                                            source.sendFeedback(() -> Text.literal("Time until next season " + totalTicksRemaining + " ticks"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
+                        )
+                        .then(CommandManager.literal("weather")
+                                .then(CommandManager.literal("clear")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            ServerWorld world = source.getWorld();
+                                            ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+
+                                            int clearTime = worldProperties.getClearWeatherTime();
+                                            source.sendFeedback(() -> Text.literal("Time until rain: " + clearTime + " ticks"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(CommandManager.literal("rain")
+                                        .executes(context -> {
+                                            ServerCommandSource source = context.getSource();
+                                            MinecraftServer server = source.getServer();
+                                            SeasonState state = SeasonState.get(server);
+                                            ServerWorld world = source.getWorld();
+                                            ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
+
+                                            int rainTime = worldProperties.getRainTime();
+                                            source.sendFeedback(() -> Text.literal("Time until clear weather: " + rainTime + " ticks"), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        })))
+                )
+                .then(CommandManager.literal("set")
+                        .then(CommandManager.argument("season", StringArgumentType.word())
+                                .suggests(((context, builder) -> CommandSource.suggestMatching(new String[]{"spring", "summer", "autumn", "winter"}, builder)))
+                                .executes(context -> {
+                                    ServerCommandSource source = context.getSource();
+                                    MinecraftServer server = source.getServer();
+                                    SeasonState state = SeasonState.get(server);
+                                    String seasonName = StringArgumentType.getString(context, "season").toUpperCase();
+                                    try {
+                                        Season season = Season.valueOf(seasonName);
+                                        state.setCurrentSeason(season, server);
+                                        //Harvestia.LOGGER.info("(ModCommands) Set season to " + season + " on server " + server);
+                                        source.sendFeedback(() -> Text.literal("Season set to " + season.getName()), false);
+                                    } catch (IllegalArgumentException e) {
+                                        source.sendError(Text.literal("Invalid season name. Use one of: spring, summer, autumn, winter"));
+                                    }
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                )
+                .then(CommandManager.literal("pause")
                         .executes(context -> {
-                            String seasonName = StringArgumentType.getString(context, "season");
-                            Season season = SeasonSharedManager.setSeasonFromString(seasonName);
+                            ServerCommandSource source = context.getSource();
+                            MinecraftServer server = source.getServer();
+                            SeasonState state = SeasonState.get(server);
 
-                            if (season != null) {
-                                context.getSource().sendFeedback(() -> Text.literal("Season set to " + seasonName), false);
-
-                                // Create a packet to send to all connected clients
-                                PacketByteBuf passedData = new PacketByteBuf(Unpooled.buffer());
-                                passedData.writeInt(season.ordinal());
-
-                                // Send to all connected players
-                                ServerCommandSource source = context.getSource();
-                                MinecraftServer server = source.getServer();
-                                if (server != null) {
-                                    server.getPlayerManager().getPlayerList().forEach(player -> ServerPlayNetworking.send(player, HarvestiaClient.SEASON_COLOR_TOGGLE_PACKET_ID, passedData));
-                                }
-
-                                return Command.SINGLE_SUCCESS;
-                            } else {
-                                context.getSource().sendError(Text.literal("Invalid season: \"" + seasonName + "\""));
+                            if (state.isSeasonPaused()) {
+                                source.sendError(Text.literal("Seasons are already paused."));
                                 return 0;
                             }
-                        }))
+
+                            state.setSeasonPaused(true);
+                            source.sendFeedback(() -> Text.literal("Seasons have been paused."), false);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                )
+                .then(CommandManager.literal("resume")
+                        .executes(context -> {
+                            ServerCommandSource source = context.getSource();
+                            MinecraftServer server = source.getServer();
+                            SeasonState state = SeasonState.get(server);
+
+                            if (!state.isSeasonPaused()) {
+                                source.sendError(Text.literal("Seasons are not paused."));
+                                return 0;
+                            }
+
+                            state.setSeasonPaused(false);
+                            source.sendFeedback(() -> Text.literal("Seasons have been resumed."), false);
+                            return Command.SINGLE_SUCCESS;
+                        })
+                )
         );
-
-        dispatcher.register(CommandManager.literal("getseason")
-                .executes(context -> {
-                    Season currentSeason = SeasonSharedManager.getCurrentSeason();
-                    context.getSource().sendFeedback(() -> Text.literal("Current season is " + currentSeason.name()), false);
-                    return Command.SINGLE_SUCCESS;
-                }));
-
-        dispatcher.register(CommandManager.literal("getraintime")
-                .executes(context -> {
-                    ServerCommandSource source = context.getSource();
-                    ServerWorld world = source.getWorld();
-
-                    // Obtain the ServerWorldProperties interface and get the rain time property
-                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
-                    int rainTime = worldProperties.getRainTime();
-
-                    // Send feedback with the rain time to the player
-                    source.sendFeedback(() -> Text.literal("Current rain time " + rainTime + " ticks"), false);
-                    return Command.SINGLE_SUCCESS;
-                }));
-        dispatcher.register(CommandManager.literal("getcleartime")
-                .executes(context -> {
-                    ServerCommandSource source = context.getSource();
-                    ServerWorld world = source.getWorld();
-
-                    ServerWorldProperties worldProperties = (ServerWorldProperties) world.getLevelProperties();
-                    int clearTime = worldProperties.getClearWeatherTime();
-
-                    source.sendFeedback(() -> Text.literal("Current clear time " + clearTime + " ticks"), false);
-                    return Command.SINGLE_SUCCESS;
-                }));
     }
 }
