@@ -1,5 +1,8 @@
 package com.ziggybadans.harvestia.world;
 
+import com.ziggybadans.harvestia.block.FailingCropBlock;
+import net.minecraft.block.Block;
+
 import java.util.EnumSet;
 import java.util.List;
 
@@ -12,7 +15,12 @@ public class CropConditions {
     private float hardiness;
 
     // Default conditions if a crop hasn't been registered
-    public CropConditions(EnumSet<Season> viableSeasons, float preferredMoisture, float optimalMinTemperature, float optimalMaxTemperature, int optimalLightLevel, float hardiness) {
+    public CropConditions(EnumSet<Season> viableSeasons,
+                          float preferredMoisture,
+                          float optimalMinTemperature,
+                          float optimalMaxTemperature,
+                          int optimalLightLevel,
+                          float hardiness) {
         this.viableSeasons = viableSeasons;
         this.preferredMoisture = preferredMoisture;
         this.optimalMinTemperature = optimalMinTemperature;

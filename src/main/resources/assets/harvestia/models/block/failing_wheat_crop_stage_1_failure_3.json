@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "harvestia:block/failing_wheat_crop_stage_1_failure_3"
+  }
+}
