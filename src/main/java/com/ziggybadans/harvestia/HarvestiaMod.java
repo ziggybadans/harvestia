@@ -1,6 +1,7 @@
 package com.ziggybadans.harvestia;
 
 import com.mojang.logging.LogUtils;
+import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,6 +28,7 @@ public class HarvestiaMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
 
         // Register the commonSetup method for mod-loading
         modEventBus.addListener(this::commonSetup);
@@ -45,6 +47,8 @@ public class HarvestiaMod {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             event.accept(ModItems.CORN);
+            event.accept(ModItems.SWEET_POTATO);
+            event.accept(ModItems.BAKED_SWEET_POTATO);
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
            event.accept(ModItems.WOODEN_SCYTHE);
            event.accept(ModItems.STONE_SCYTHE);
@@ -52,6 +56,9 @@ public class HarvestiaMod {
            event.accept(ModItems.GOLDEN_SCYTHE);
            event.accept(ModItems.DIAMOND_SCYTHE);
            event.accept(ModItems.NETHERITE_SCYTHE);
+        } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            event.accept(ModBlocks.ROCKY_STONE);
+            event.accept(ModItems.CORN_KERNALS);
         }
     }
 

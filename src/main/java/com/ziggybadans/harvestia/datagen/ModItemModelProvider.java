@@ -18,6 +18,9 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(ModItems.CORN);
+        simpleItem(ModItems.CORN_KERNALS);
+        simpleItem(ModItems.SWEET_POTATO);
+        simpleItem(ModItems.BAKED_SWEET_POTATO);
 
         handheldItem(ModItems.WOODEN_SCYTHE);
         handheldItem(ModItems.STONE_SCYTHE);

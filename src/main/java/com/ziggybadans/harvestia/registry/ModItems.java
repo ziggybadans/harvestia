@@ -3,6 +3,7 @@ package com.ziggybadans.harvestia.registry;
 import com.ziggybadans.harvestia.HarvestiaMod;
 import com.ziggybadans.harvestia.item.ScytheItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -15,8 +16,10 @@ public class ModItems {
 
     public static final RegistryObject<Item> CORN = ITEMS.register("corn",
             () -> new Item(new Item.Properties().food(ModFoods.CORN)));
+    public static final RegistryObject<Item> CORN_KERNALS = ITEMS.register("corn_kernals",
+        () -> new ItemNameBlockItem(ModBlocks.CORN_CROP.get(), new Item.Properties()));
     public static final RegistryObject<Item> SWEET_POTATO = ITEMS.register("sweet_potato",
-            () -> new Item(new Item.Properties().food(ModFoods.SWEET_POTATO)));
+            () -> new ItemNameBlockItem(ModBlocks.SWEET_POTATO_CROP.get(), new Item.Properties().food(ModFoods.SWEET_POTATO)));
     public static final RegistryObject<Item> BAKED_SWEET_POTATO = ITEMS.register("baked_sweet_potato",
             () -> new Item(new Item.Properties().food(ModFoods.BAKED_SWEET_POTATO)));
 
