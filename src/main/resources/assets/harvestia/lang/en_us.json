@@ -1,3 +1,10 @@
 {
-  "item.harvestia.corn": "Corn"
+  "item.harvestia.corn": "Corn",
+
+  "item.harvestia.wooden_scythe": "Wooden Scythe",
+  "item.harvestia.stone_scythe": "Stone Scythe",
+  "item.harvestia.iron_scythe": "Iron Scythe",
+  "item.harvestia.golden_scythe": "Golden Scythe",
+  "item.harvestia.diamond_scythe": "Diamond Scythe",
+  "item.harvestia.netherite_scythe": "Netherite Scythe"
 }

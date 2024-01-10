@@ -45,6 +45,13 @@ public class HarvestiaMod {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             event.accept(ModItems.CORN);
+        } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+           event.accept(ModItems.WOODEN_SCYTHE);
+           event.accept(ModItems.STONE_SCYTHE);
+           event.accept(ModItems.IRON_SCYTHE);
+           event.accept(ModItems.GOLDEN_SCYTHE);
+           event.accept(ModItems.DIAMOND_SCYTHE);
+           event.accept(ModItems.NETHERITE_SCYTHE);
         }
     }
 
