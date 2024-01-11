@@ -4,7 +4,12 @@ import com.mojang.logging.LogUtils;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
 import com.ziggybadans.harvestia.util.SeasonEventHandler;
+import com.ziggybadans.harvestia.world.SeasonalBlockColor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -82,6 +87,20 @@ public class HarvestiaMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            Minecraft minecraft = Minecraft.getInstance();
+            BlockColors blockColors = minecraft.getBlockColors();
+
+            SeasonalBlockColor seasonalBlockColor = new SeasonalBlockColor();
+
+            Block[] affectedBlocks = new Block[] {
+                    Blocks.GRASS_BLOCK,
+                    Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.BIRCH_LEAVES,
+                    Blocks.GRASS, Blocks.TALL_GRASS, Blocks.FERN, Blocks.VINE
+            };
+
+            for (Block block : affectedBlocks) {
+                blockColors.register(seasonalBlockColor, block);
+            }
         }
     }
 }

@@ -25,6 +25,8 @@ public class SeasonUpdatePacket {
     public static class Handler {
         public static void handle(final SeasonUpdatePacket msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
+                SeasonHandler.updateClientSeason(msg.season);
+
                 Minecraft mc = Minecraft.getInstance();
                 mc.levelRenderer.allChanged();
             });

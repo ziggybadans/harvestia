@@ -27,9 +27,6 @@ public enum Season {
     public String getName() {
         return name;
     }
-    public Season getNextSeason() {
-        return values()[(this.ordinal() + 1) % values().length];
-    }
     public float getRedTint() {
         return redTint;
     }
