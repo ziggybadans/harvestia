@@ -1,19 +1,16 @@
 package com.ziggybadans.harvestia.item;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Set;
 
 public class ScytheItem extends TieredItem {
@@ -41,7 +38,6 @@ public class ScytheItem extends TieredItem {
             Blocks.PEONY,
             Blocks.PITCHER_PLANT
     );
-
     private static final Set<Block> LEAVES = Set.of(
             Blocks.ACACIA_LEAVES,
             Blocks.BIRCH_LEAVES,
@@ -54,7 +50,6 @@ public class ScytheItem extends TieredItem {
             Blocks.OAK_LEAVES,
             Blocks.SPRUCE_LEAVES
     );
-
     private static final Set<Block> CROPS = Set.of(
             Blocks.WHEAT,
             Blocks.PITCHER_CROP
@@ -65,45 +60,42 @@ public class ScytheItem extends TieredItem {
     }
 
     @Override
-    public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
-        return ToolActions.DEFAULT_SWORD_ACTIONS.contains(toolAction);
+    public boolean mineBlock(ItemStack pStack, Level pLevel, BlockState pState, BlockPos pPos, LivingEntity pMiningEntity) {
+        System.out.println("(Harvestia): Player is using scythe");
+        if (!pLevel.isClientSide && pMiningEntity instanceof Player player) {
+            if (player.isCrouching()) {
+                System.out.println("(Harvestia): Mining block as normal");
+                return super.mineBlock(pStack, pLevel, pState, pPos, pMiningEntity);
+            }
+
+            if (LEAVES.contains(pState.getBlock())) {
+                System.out.println("(Harvestia): Breaking leaves");
+                areaOfEffectHarvest(pLevel, pPos, player, 1, LEAVES);
+                pStack.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else if (FOLIAGE.contains(pState.getBlock()) || CROPS.contains(pState.getBlock())) {
+                System.out.println("(Harvestia): Breaking foliage or crops");
+                areaOfEffectHarvest(pLevel, pPos, player, 2, FOLIAGE, CROPS);
+                pStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            }
+        }
+        return super.mineBlock(pStack, pLevel, pState, pPos, pMiningEntity);
     }
 
-    @Override
-    public boolean onBlockStartBreak(ItemStack itemStack, BlockPos pos, Player player) {
-        Level world = player.level();
-
-        if (!world.isClientSide && !player.isCreative()) {
-            BlockState state = world.getBlockState(pos);
-            Block block = state.getBlock();
-
-            int yRange = LEAVES.contains(block) ? 1 : 0;
-            int xzRange = LEAVES.contains(block) ? 3 : 5;
-
-            if (!player.isCrouching()) {
-                for (int x = -xzRange; x <= xzRange; x++) {
-                    for (int y = -yRange; y <= yRange; y++) {
-                        for (int z = -xzRange; z <= xzRange; z++) {
-                            if (x == 0 && y == 0 && z == 0) continue;
-                            BlockPos targetPos = pos.offset(x, y, z);
-                            BlockState targetState = world.getBlockState(targetPos);
-                            Block targetBlock = targetState.getBlock();
-
-                            if (LEAVES.contains(targetBlock) || (FOLIAGE.contains(targetBlock) || CROPS.contains(targetBlock))) {
-                                Block.dropResources(targetState, world, targetPos, null, player, itemStack);
-                                world.removeBlock(targetPos, false);
-                            }
+    private void areaOfEffectHarvest(Level world, BlockPos centerPos, Player player, int radius, Set<Block>... targets) {
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = (radius == 1 ? -radius : 0); y <= (radius == 1 ? radius : 0); y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos currentPos = centerPos.offset(x, y, z);
+                    BlockState currentState = world.getBlockState(currentPos);
+                    for (Set<Block> targetSet : targets) {
+                        if (targetSet.contains(currentState.getBlock())) {
+                            System.out.println("(Harvestia): Block broken");
+                            world.destroyBlock(currentPos, true, player);
+                            break;
                         }
                     }
                 }
-                itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(EquipmentSlot.MAINHAND));
             }
         }
-        return false;
-    }
-
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        pTooltipComponents.add(Component.literal("Cuts a 3x3 area of foliage and crops, or a 3x3x3 area of leaves."));
     }
 }

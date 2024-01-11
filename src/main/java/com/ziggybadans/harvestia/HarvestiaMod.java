@@ -10,11 +10,14 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.Logging;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+
+import java.util.logging.LogManager;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(HarvestiaMod.MOD_ID)
@@ -22,13 +25,15 @@ public class HarvestiaMod {
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "harvestia";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public HarvestiaMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModItems.register(modEventBus);
+        LOGGER.info("Registering items");
         ModBlocks.register(modEventBus);
+        LOGGER.info("Registering blocks");
 
         // Register the commonSetup method for mod-loading
         modEventBus.addListener(this::commonSetup);
@@ -38,6 +43,7 @@ public class HarvestiaMod {
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
+        LOGGER.info("Adding items to creative tabs");
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
