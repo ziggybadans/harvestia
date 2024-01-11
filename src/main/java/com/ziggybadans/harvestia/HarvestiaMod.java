@@ -3,9 +3,7 @@ package com.ziggybadans.harvestia;
 import com.mojang.logging.LogUtils;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
-import com.ziggybadans.harvestia.util.SeasonCommands;
 import com.ziggybadans.harvestia.util.SeasonEventHandler;
-import com.ziggybadans.harvestia.world.SeasonalBlockColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -14,18 +12,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.Logging;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
-
-import java.util.logging.LogManager;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(HarvestiaMod.MOD_ID)
@@ -81,8 +75,8 @@ public class HarvestiaMod {
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event, RegisterCommandsEvent commandsEvent) {
-        SeasonCommands.register(commandsEvent.getDispatcher());
+    public void onServerStarting(ServerStartingEvent event) {
+
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -90,20 +84,6 @@ public class HarvestiaMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            Minecraft minecraft = Minecraft.getInstance();
-            BlockColors blockColors = minecraft.getBlockColors();
-
-            SeasonalBlockColor seasonalBlockColor = new SeasonalBlockColor();
-
-            Block[] affectedBlocks = new Block[] {
-                    Blocks.GRASS_BLOCK,
-                    Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES, Blocks.BIRCH_LEAVES,
-                    Blocks.GRASS, Blocks.TALL_GRASS, Blocks.FERN, Blocks.VINE
-            };
-
-            for (Block block : affectedBlocks) {
-                blockColors.register(seasonalBlockColor, block);
-            }
         }
     }
 }

@@ -9,9 +9,12 @@ public class SeasonHandler {
     private static Season currentClientSeason = Season.SUMMER;
 
     public static Season getCurrentSeason(Level world) {
-        if (!world.isClientSide()) {
-            return SeasonData.get((ServerLevel) world).getCurrentSeason();
+        if (world.isClientSide()) {
+            return currentClientSeason;
+        } else if (world instanceof ServerLevel) {
+                return SeasonData.get((ServerLevel) world).getCurrentSeason();
         } else {
+            System.out.println("Attempted to get season from an unrecognised level type");
             return currentClientSeason;
         }
     }

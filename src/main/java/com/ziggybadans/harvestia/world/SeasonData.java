@@ -11,7 +11,8 @@ public class SeasonData extends SavedData {
     private static final String DATA_NAME = "season_data";
     private Season currentSeason;
     private int daysElapsed;
-    public int SEASON_LENGTH = 14;
+    private boolean seasonChanging = false;
+    public int SEASON_LENGTH = 2;
 
     public SeasonData() {
         this.currentSeason = Season.SPRING;
@@ -38,16 +39,14 @@ public class SeasonData extends SavedData {
         return level.getDataStorage().computeIfAbsent(SeasonData::load, SeasonData::new, DATA_NAME);
     }
 
-    public void incrementDay() {
-        daysElapsed++;
-        boolean seasonChanged = false;
-        if (daysElapsed >= SEASON_LENGTH) {
-            daysElapsed = 0;
+    public void incrementDay(ServerLevel world) {
+        daysElapsed = (int) ((world.getDayTime() / 24000) % 3);
+        //System.out.println("(Harvestia): New day, days elapsed: " + daysElapsed);
+        if (daysElapsed >= SEASON_LENGTH && !seasonChanging) {
             currentSeason = Season.values()[(currentSeason.ordinal() + 1) % Season.values().length];
             setDirty();
-            seasonChanged = true;
-        }
-        if (seasonChanged) {
+            seasonChanging = true;
+            System.out.println("(Harvestia): Season has changed");
             ModNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new SeasonUpdatePacket(currentSeason));
         }
     }
@@ -63,5 +62,8 @@ public class SeasonData extends SavedData {
     }
     public int getDaysElapsed() {
         return daysElapsed;
+    }
+    public void resetSeasonChanging() {
+        seasonChanging = false;
     }
 }
