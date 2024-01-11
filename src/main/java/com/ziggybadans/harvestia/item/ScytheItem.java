@@ -61,19 +61,15 @@ public class ScytheItem extends TieredItem {
 
     @Override
     public boolean mineBlock(ItemStack pStack, Level pLevel, BlockState pState, BlockPos pPos, LivingEntity pMiningEntity) {
-        System.out.println("(Harvestia): Player is using scythe");
         if (!pLevel.isClientSide && pMiningEntity instanceof Player player) {
             if (player.isCrouching()) {
-                System.out.println("(Harvestia): Mining block as normal");
                 return super.mineBlock(pStack, pLevel, pState, pPos, pMiningEntity);
             }
 
             if (LEAVES.contains(pState.getBlock())) {
-                System.out.println("(Harvestia): Breaking leaves");
                 areaOfEffectHarvest(pLevel, pPos, player, 1, LEAVES);
                 pStack.hurtAndBreak(3, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else if (FOLIAGE.contains(pState.getBlock()) || CROPS.contains(pState.getBlock())) {
-                System.out.println("(Harvestia): Breaking foliage or crops");
                 areaOfEffectHarvest(pLevel, pPos, player, 2, FOLIAGE, CROPS);
                 pStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             }
@@ -89,7 +85,6 @@ public class ScytheItem extends TieredItem {
                     BlockState currentState = world.getBlockState(currentPos);
                     for (Set<Block> targetSet : targets) {
                         if (targetSet.contains(currentState.getBlock())) {
-                            System.out.println("(Harvestia): Block broken");
                             world.destroyBlock(currentPos, true, player);
                             break;
                         }

@@ -3,6 +3,7 @@ package com.ziggybadans.harvestia;
 import com.mojang.logging.LogUtils;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
+import com.ziggybadans.harvestia.util.SeasonEventHandler;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,6 +41,7 @@ public class HarvestiaMod {
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(SeasonEventHandler.class);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
@@ -47,6 +49,8 @@ public class HarvestiaMod {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        ModNetwork.registerMessages();
+        LOGGER.info("Registering networking tools");
     }
 
     // Add the example block item to the building blocks tab
