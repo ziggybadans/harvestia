@@ -3,6 +3,7 @@ package com.ziggybadans.harvestia;
 import com.mojang.logging.LogUtils;
 import com.ziggybadans.harvestia.registry.ModBlocks;
 import com.ziggybadans.harvestia.registry.ModItems;
+import com.ziggybadans.harvestia.util.SeasonCommands;
 import com.ziggybadans.harvestia.util.SeasonEventHandler;
 import com.ziggybadans.harvestia.world.SeasonalBlockColor;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -79,7 +81,8 @@ public class HarvestiaMod {
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event, RegisterCommandsEvent commandsEvent) {
+        SeasonCommands.register(commandsEvent.getDispatcher());
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

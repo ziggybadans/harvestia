@@ -11,6 +11,7 @@ public class SeasonData extends SavedData {
     private static final String DATA_NAME = "season_data";
     private Season currentSeason;
     private int daysElapsed;
+    public int SEASON_LENGTH = 14;
 
     public SeasonData() {
         this.currentSeason = Season.SPRING;
@@ -40,7 +41,7 @@ public class SeasonData extends SavedData {
     public void incrementDay() {
         daysElapsed++;
         boolean seasonChanged = false;
-        if (daysElapsed >= 14) {
+        if (daysElapsed >= SEASON_LENGTH) {
             daysElapsed = 0;
             currentSeason = Season.values()[(currentSeason.ordinal() + 1) % Season.values().length];
             setDirty();
@@ -51,7 +52,16 @@ public class SeasonData extends SavedData {
         }
     }
 
+    public void setCurrentSeason(Season newSeason) {
+        currentSeason = newSeason;
+        setDirty();
+        ModNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new SeasonUpdatePacket(currentSeason));
+    }
+
     public Season getCurrentSeason() {
         return currentSeason;
+    }
+    public int getDaysElapsed() {
+        return daysElapsed;
     }
 }
