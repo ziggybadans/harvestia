@@ -20,6 +20,7 @@ public class SeasonHandler {
     }
 
     public static Season getCurrentSeason() {
+        //System.out.println("(Harvestia): Current season is " + currentClientSeason);
         return currentClientSeason;
     }
 
